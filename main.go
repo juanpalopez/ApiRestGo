@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -86,10 +87,55 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateProduct a new product
-func CreateProduct(w http.ResponseWriter, r *http.Request) {}
+func CreateProduct(w http.ResponseWriter, r *http.Request) {
+	// params := mux.Vars(r)
+	var product MarketProduct
+	_ = json.NewDecoder(r.Body).Decode(&product)
+	// id, err := strconv.Atoi(params["idMarketProduct"])
+	// if err == nil {
+	// 	errors.New("Couldnt cast string to integer")
+	// }
+	// product.IDMarketProduct = id
+	marketProducts = append(marketProducts, product)
+	json.NewEncoder(w).Encode(marketProducts)
+}
 
 // DeleteProduct by id
-func DeleteProduct(w http.ResponseWriter, r *http.Request) {}
+func DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err == nil {
+		errors.New("Couldnt cast string to integer")
+	}
+	for index, item := range marketProducts {
+		if item.IDMarketProduct == id {
+			marketProducts = append(marketProducts[:index], marketProducts[index+1:]...)
+			break
+		}
+	}
+	json.NewEncoder(w).Encode(marketProducts)
+}
 
 // UpdateProduct by id
-func UpdateProduct(w http.ResponseWriter, r *http.Request) {}
+func UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	var product MarketProduct
+	_ = json.NewDecoder(r.Body).Decode(&product)
+
+	id, err := strconv.Atoi(params["id"])
+	fmt.Println(id)
+
+	if err == nil {
+		errors.New("Couldnt cast string to integer")
+	}
+
+	for index, item := range marketProducts {
+		if item.IDMarketProduct == id {
+			marketProducts[index] = product
+			break
+		}
+	}
+
+	json.NewEncoder(w).Encode(product)
+}
